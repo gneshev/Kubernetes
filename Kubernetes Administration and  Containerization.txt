@@ -1,0 +1,103 @@
+Kubernetes Administration & Containerization: From Zero to Hero
+
+Module 1: Containerization with Docker (Fundamentals)
+1. Difference Between Images and Containers
+
+2. What is Docker & Basic CLI Commands
+
+3. Container Lifecycle & Practical Examples with Nginx
+
+4. Cleaning Up Environments
+
+5. Creating Custom Images: Dockerfile
+
+6. Data Persistence (Volumes & Bind Mounts) + Lab
+
+7. Docker Networking
+
+8. Container Registries & Pushing to Docker Hub + Lab
+
+
+
+Module 2: Preparing for Kubernetes – YAML Concepts
+1. Introduction to YAML Concepts (Maps, Lists, Indentation)
+
+2. Required Fields for Kubernetes Objects
+
+
+Module 3: Kubernetes Architecture and Cluster Access
+1. Introduction to Kubernetes
+
+2. Cluster Architecture: Control Plane (Master Node) and Its Components
+
+3. Worker Nodes and Their Components (Container Runtime, Kubelet, Kube-proxy)
+
+4. Cluster Communication: What is kubectl and the API Server
+
+5. Configuring Access: Understanding the kubeconfig File and Contexts + Lab
+
+6. Installing a 2-Node Kubernetes Cluster
+
+
+Module 4: Declarative Management and Kubernetes Workloads
+1. Imperative vs. Declarative Approach
+
+2. Anatomy of a Kubernetes YAML Manifest
+
+3. Core Workloads:
+
+* Pods
+
+* Multi-container Pods & Sidecars + Lab
+
+* ReplicaSets
+
+* Deployments
+
+* DaemonSets
+
+* Jobs & CronJobs
+
+
+Module 5: Scheduling Management & Advanced Node Placement
+1. Taints and Tolerations + Practical Examples
+
+2. Node Affinity / Node Selector
+
+
+Module 6: Kubernetes Networking Model and Services
+1. Kubernetes Network Model and the Role of CNI & Kube-Proxy
+
+2. Ephemeral IP Addresses and the Need for Services
+
+3. ClusterIP Service + Lab
+
+4. NodePort Service + Lab
+
+5. LoadBalancer Service
+
+
+Module 7: Application Configuration & Data Storage (State & Configuration)
+Stateless vs. Stateful Applications
+
+1. Brief Introduction: Why Containers Lose Data on Restart (Ephemerality)
+
+2. Kubernetes Storage Model:
+
+Volumes: Overview (e.g., emptyDir and hostPath for basic needs)
+
+Persistent Volumes (PV): Provisioned Physical/Cloud Storage (Admin Side)
+
+Persistent Volume Claims (PVC): Requesting Storage Resources (Developer/Pod Side)
+
+Storage Classes (SC): Dynamic Storage Provisioning
+
+Lab: Creating a PVC and Mounting It to a Pod
+
+4. Configuration Management with ConfigMaps (CM) + Lab
+
+5. Sensitive Data Management with Secrets
+
+
+Module 8: Advanced Administration and Security
+1. RBAC – Roles, ClusterRoles, RoleBindings

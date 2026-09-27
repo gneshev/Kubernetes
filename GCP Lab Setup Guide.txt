@@ -1,0 +1,134 @@
+Инструкция за създаване на VM в GCP
+
+Параметри на Виртуалната Машина
+
+При създаване на инстанцията в GCP Compute Engine изберете следните ресурси:
+
+OS: Ubuntu 22.04 LTS или 24.04 LTS
+
+Machine Type: e2-standard-2 (2 vCPU, 8 GB RAM) – 1 vCPU / 4GB е минимумът, но 8GB осигурява гладка работа за MicroK8s + Docker.
+
+Boot Disk: 30 GB - 50 GB Balanced Persistent Disk (за да има достатъчно място за Docker имиджи).
+
+Firewall: Отметнете Allow HTTP traffic и Allow HTTPS traffic.
+
+
+
+Настройка на GCP Firewall Rule
+
+gcloud compute firewall-rules create allow-k8s-nodeports \
+    --allow tcp:30000-32767 \
+    --source-ranges 0.0.0.0/0 \
+    --description "Allow Kubernetes NodePort services for demo"
+	
+
+Свързване през SSH и инсталация
+
+
+Създай bash скрипт със следната спецификация:
+
+Име на файла: gcp-setup.sh
+
+Съдържание:
+
+#!/bin/bash
+set -e
+
+TARGET_USER=${SUDO_USER:-$USER}
+
+echo "=== 0. Корекция на Hostname за MicroK8s (Max 64 символа за OpenSSL) ==="
+# Задаване на кратко име, за да се избегне грешката "string too long"
+NEW_HOSTNAME="gcp-k8s-node"
+sudo hostnamectl set-hostname "$NEW_HOSTNAME"
+
+# Предотвратяване на връщането на стария hostname от GCP Guest Agent
+if [ -f /etc/default/instance_configs.cfg ]; then
+    sudo sed -i 's/set_hostname = true/set_hostname = false/g' /etc/default/instance_configs.cfg
+fi
+
+# Актуализиране на /etc/hosts
+if ! grep -q "$NEW_HOSTNAME" /etc/hosts; then
+    sudo sed -i "1s/^/127.0.0.1 $NEW_HOSTNAME\n/" /etc/hosts
+fi
+
+echo "=== 1. Подготовка на GCP VM и пакети ==="
+sudo apt-get update
+sudo apt-get install -y ca-certificates curl gnupg lsb-release apt-transport-https iptables
+
+echo "=== 2. Инсталиране на Docker Engine ==="
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg --yes
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+echo "=== 3. Инсталиране на kubectl (v1.30) ==="
+curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.30/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg --yes
+sudo chmod a+r /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.30/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list > /dev/null
+
+sudo apt-get update
+sudo apt-get install -y docker-ce docker-ce-cli containerd.io kubectl
+
+echo "=== 4. Инсталиране на MicroK8s ==="
+sudo snap install microk8s --classic --channel=1.30/stable
+
+echo "=== 5. Конфигуриране на правата за потребителя: $TARGET_USER ==="
+sudo usermod -aG docker "$TARGET_USER"
+sudo usermod -aG microk8s "$TARGET_USER"
+
+TARGET_HOME=$(eval echo ~"$TARGET_USER")
+mkdir -p "$TARGET_HOME/.kube"
+sudo chown -R "$TARGET_USER:$TARGET_USER" "$TARGET_HOME/.kube"
+
+echo "=== 6. Настройка на MicroK8s за GCP ==="
+# Изчакване на клъстера
+sudo microk8s status --wait-ready
+
+# Активиране на нужните добавки
+sudo microk8s enable dns storage
+
+# Конфигуриране на kubectl да ползва MicroK8s по подразбиране
+sudo microk8s config > "$TARGET_HOME/.kube/config"
+sudo chown "$TARGET_USER:$TARGET_USER" "$TARGET_HOME/.kube/config"
+chmod 600 "$TARGET_HOME/.kube/config"
+
+echo "=== 7. Разрешаване на IP Forwarding (Важно за GCP) ==="
+sudo sysctl net.ipv4.ip_forward=1
+echo "net.ipv4.ip_forward=1" | sudo tee -a /etc/sysctl.conf
+
+echo "-------------------------------------------------------------------"
+echo " Успешна инсталация в GCP!"
+echo " За да работите без sudo, изпълнете:"
+echo "   newgrp docker"
+echo "   newgrp microk8s"
+echo "-------------------------------------------------------------------"
+
+
+chmod +x gcp-setup.sh
+./gcp-setup.sh
+
+Финална проверка
+
+След приключване на скрипта изпълнете:
+newgrp docker
+newgrp microk8s
+kubectl get nodes
+kubectl get pods -A
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

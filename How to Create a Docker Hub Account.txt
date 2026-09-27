@@ -1,0 +1,47 @@
+
+Step 1: Go to the Docker Hub Sign-Up Page
+Open your web browser and navigate to hub.docker.com/signup.
+
+Step 2: Choose Your Sign-Up Method
+You can create an account in one of two ways:
+
+You can sign up using a direct email address or sign in with a third-party account (Google or GitHub):
+
+Email: Enter a valid email address and set a password (must be at least 9 characters long).
+
+Google / GitHub: Select your provider and authorize Docker to link your existing account.
+
+Step 3: Set Your Docker ID (Username)
+Enter a unique username. This is your permanent Docker ID.
+
+Important Details:
+
+Enter a unique username. This will serve as your permanent Docker ID for your profile and repository paths (e.g., docker.io/your-id/repository-name).
+
+Requirements: 4 to 30 characters long, containing only numbers and lowercase letters.
+
+Note: You cannot change or reuse your Docker ID once created.
+
+Step 4: Accept Terms and Complete Registration
+Review and check the box to accept Docker's Terms of Service and Privacy Policy, then click Sign Up.
+
+Step 5: Verify Your Email
+Check your email inbox for a confirmation message from Docker.
+
+If registering via email, copy the One-Time Password (OTP) code sent to you and enter it on the Docker verification page.
+
+If registering via Google or GitHub, ensure that your provider email is fully verified.
+
+Step 6: Log In and Access Your Dashboard
+Go back to hub.docker.com.
+
+Log in using your Docker ID (or email address) and password.
+
+
+
+
+
+
+
+
+
